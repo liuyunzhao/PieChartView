@@ -164,6 +164,11 @@ public class PieChartView5 extends View {
         goDrawArc(canvas);
     }
 
+    /**
+     * 1：算出弧形和弧形间的间隔各自占多少度数
+     * 2：通过循环先画每个弧形大小、再通过循环画每个间隔大小
+     * 3：通过属性动画来实现动态增加
+     */
     private void goDrawArc(Canvas canvas) {
         Log.d("liuyz", "onDraw:" + measureWidth + "x" + measureHeight);
         float startAngle = 0;
@@ -171,6 +176,7 @@ public class PieChartView5 extends View {
         float sweepLineAngle;
         count = 0;
         float linetotal = 360 - data.length * SPACE_DEGREES;
+        //循环画弧形
         for (int i = 0; i < data.length; i++) {
             float percent = data[i] / totalNum;
             float sweepAngle = data[i] / totalNum * linetotal;//每个扇形的角度
@@ -188,6 +194,7 @@ public class PieChartView5 extends View {
 
         startAngle = 0;//每次弧形画完成后，都需要重置再画线，这样可以让白线在弧形上面
 
+        //循环画线
         for (int i = 0; i < data.length; i++) {
             float sweepAngle = data[i] / totalNum * linetotal;//每个扇形的角度
             sweepAngle = sweepAngle * animationValue;
@@ -237,6 +244,12 @@ public class PieChartView5 extends View {
                 arcDataPaint);
     }
 
+    /**
+     * 根据旋转的度数，计算出圆上的点相对于自定义View的(0,0)的坐标
+     *
+     * @param degree 旋转的度数
+     * @param radius 半径
+     */
     private float[] calculatePosition(float degree, float radius) {
         //由于Math.sin(double a)中参数a不是度数而是弧度，所以需要将度数转化为弧度
         //而Math.toRadians(degree)的作用就是将度数转化为弧度
@@ -259,11 +272,15 @@ public class PieChartView5 extends View {
         return position;
     }
 
+    /**
+     * 通过count、comparePosition值来判断是否需要放大、缩小弧形区域
+     */
     private void drawArc(Canvas canvas, float startAngle, float rotateAngle, int color, int i) {
         Log.d("huaLine", startAngle + "x" + rotateAngle);
         arcPaint.setColor(color);
         if (position - 1 == i && !(comparePosition == position)) {
             count += 1;
+            //需要放大时使用rectfTouch
             canvas.drawArc(rectfTouch, startAngle, rotateAngle, false, arcPaint);
         } else {
             count += 0;
@@ -271,14 +288,18 @@ public class PieChartView5 extends View {
         }
     }
 
-    private void drawLine(Canvas canvas, float lineAngle, float degree, int i) {
-        float arcCenterDegree = 90 + lineAngle - degree / 2;
+    /**
+     * 通过间隔弧度，算出弧度两点连线的距离，然后再从圆心开始画直线
+     */
+    private void drawLine(Canvas canvas, float lineStartAngle, float degree, int i) {
+        float arcCenterDegree = 90 + lineStartAngle - degree / 2;
         Log.d("huaLine", degree + "--");
 
         //由于Math.sin(double a)中参数a不是度数而是弧度，所以需要将度数转化为弧度
         //sin 对边与斜边的比叫做∠α的正弦
         //con 临边与斜边的比叫余弦
         //因为画弧形style模式设置为STROKE，所以需要再加上弧形宽度的一半
+        //根据度数计算出弧形两点连线的距离
         double lineWidth = Math.sin(Math.toRadians(degree / 2)) * (radius + cicleWidth / 2) * 2;
         linePaint.setStrokeWidth((float) lineWidth);
         //弧度中心坐标
@@ -312,6 +333,9 @@ public class PieChartView5 extends View {
         invalidate();
     }
 
+    /**
+     * 生成随机颜色
+     */
     private int randomColor() {
         int r = random.nextInt(255);
         int g = random.nextInt(255);
@@ -353,6 +377,12 @@ public class PieChartView5 extends View {
         animator.start();
     }
 
+    /**
+     * 1：通过atan2函数计算出点击时的角度
+     * 2：通过象限转换成坐标系的角度
+     * 3：通过sqrt（开根号）勾股定理计算出点击区域是否在半径内
+     * 4：通过binarySearch（二分查找）计算出点击的position
+     */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
