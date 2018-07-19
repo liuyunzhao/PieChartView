@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="Generator" content="EditPlus®">
+	<meta name="Author" content="">
+	<meta name="Keywords" content="">
+	<meta name="Description" content="">
+	<title>H5页面上传手机照片</title>
+</head>
+<body>
+<script>
+
+function previewFile1() {
+        var img = document.getElementById("preview1");
+        // 仅限上传单张图片
+        var file =document.getElementById("demo1").files[0];
+        var text2 = document.getElementById("text2");
+        var reader  = new FileReader();
+        reader.addEventListener("load", function () {
+                img.src = reader.result;  // 存储在本地的图片的base64编码
+        }, false);
+
+        if (file) {
+          reader.readAsDataURL(file);
+        }
+     }
+
+     function previewFile2() {
+        var img2 = document.getElementById("preview2");
+        // 仅限上传单张图片
+        var file2 = document.getElementById("demo2").files[0];
+        var reader2  = new FileReader();
+        reader2.addEventListener("load", function () {
+                img2.src = reader2.result;  // 存储在本地的图片的base64编码
+        }, false);
+
+        if (file2) {
+          reader2.readAsDataURL(file2);
+        }
+     }
+
+</script>
+<form action="">
+	<p>图片1: <input type="file" id="demo1" accept="image/*" name="uploadImg1" onchange="previewFile1()"/></p>
+	<p>图片2: <input type="file" id="demo2" name="uploadImg2" onchange="previewFile2()"/></p>
+	<img id="preview1" src="" width="100" height="100"/>
+	<br>
+	<img id="preview2" src="" width="100" height="100"/>
+</form>
+</body>
+</html>
+
+
+<!--
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+
+	<input type="file" id = "imge" accept="image/*" capture='camera'/>
+
+</body>
+</html>-->
